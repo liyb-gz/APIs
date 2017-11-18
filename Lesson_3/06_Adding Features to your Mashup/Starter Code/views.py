@@ -36,12 +36,22 @@ def all_restaurants_handler():
     elif request.method == 'GET':
         return get_all_restaurant()
     
-@app.route('/restaurants/<int:id>', methods = ['GET','PUT', 'DELETE'])
+@app.route('/restaurants/<int:id>/', methods = ['GET','PUT', 'DELETE'])
 def restaurant_handler(id):
     if request.method == 'GET':
         return get_restaurant(id)
+
     elif request.method == 'PUT':
-        return update_restaurant(id)
+        name = request.args.get('name')
+        address = request.args.get('address')
+        image = request.args.get('image')
+
+        return update_restaurant(id, {
+            'name': name,
+            'address': address,
+            'image': image
+        })
+
     elif request.method == 'DELETE':
         return delete_restaurant(id)
 
@@ -65,9 +75,40 @@ def get_restaurant(id):
     except exc.NoResultFound:
         return jsonify(error = 'No restaurant matches the given id.'), 404
 
+def update_restaurant(id, resInfo):
+    try:
+        res = session.query(Restaurant).filter_by(id = id).one()
+        print resInfo
 
-def update_restaurant(id):
-    return 'update one'
+        if all([value is None for value in resInfo.values()]):
+            raise ValueError()
+
+        else:
+            if resInfo.get('name') is not None:
+                res.restaurant_name = resInfo.get('name')
+
+            if resInfo.get('address') is not None:
+                res.restaurant_address = resInfo.get('address')
+
+            if resInfo.get('image') is not None:
+                res.restaurant_image = resInfo.get('image')
+
+        session.add(res)
+        session.commit()
+
+        return jsonify(Restaurant = res.serialize)
+
+    except exc.NoResultFound:
+        return jsonify(error = 'No restaurant matches the given id.'), 404
+
+    except ValueError:
+        return jsonify(error = 'Cannot update the restaurant. ' + \
+                'Missing Parameters.'), 400
+
+    except Exception as ex:
+        template = "An exception of type {0} occurred. Arguments:\n{1!r}"
+        message = template.format(type(ex).__name__, ex.args)
+        return jsonify(error = message), 404
 
 def delete_restaurant(id):
     return 'delete one'
