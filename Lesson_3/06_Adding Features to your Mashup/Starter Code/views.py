@@ -59,7 +59,11 @@ def get_all_restaurant():
     return jsonify(Restaurants = [res.serialize for res in restaurants])
 
 def get_restaurant(id):
-    return 'get one'
+    try:
+        res = session.query(Restaurant).filter_by(id = id).one()
+        return jsonify(Restaurant = res.serialize)
+    except:
+        return jsonify(error = 'Unable to get the restaurant.'), 404
 
 def update_restaurant(id):
     return 'update one'
