@@ -30,10 +30,9 @@ def all_restaurants_handler():
            (location is not None):
             return create_new_restaurant(mealType, location)
         else:
-            error_msg = jsonify({
-                'error': 'Cannot create the restaurant. Some parameter(s) missing. '
-                })
-            return error_msg, 404
+            error_msg = jsonify(error = \
+                'Cannot create the restaurant. Some parameter(s) missing. ')
+            return error_msg, 400
     elif request.method == 'GET':
         return get_all_restaurant()
     
