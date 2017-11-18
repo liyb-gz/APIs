@@ -56,7 +56,8 @@ def create_new_restaurant(mealType, location):
     return jsonify(Restaurant = newRes.serialize)
 
 def get_all_restaurant():
-    return 'get all'
+    restaurants = session.query(Restaurant).all()
+    return jsonify(restaurants = [res.serialize for res in restaurants])
 
 def get_restaurant(id):
     return 'get one'
