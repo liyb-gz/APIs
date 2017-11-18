@@ -21,10 +21,19 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 app = Flask(__name__)
 
-@app.route('/restaurants', methods = ['GET', 'POST'])
+@app.route('/restaurants/', methods = ['GET', 'POST'])
 def all_restaurants_handler():
     if request.method == 'POST':
-        return create_new_restaurant()
+        mealType = request.args.get('mealType')
+        location = request.args.get('location')
+        if (mealType is not None) and \
+           (location is not None):
+            return create_new_restaurant(mealType, location)
+        else:
+            error_msg = jsonify({
+                'error': 'Cannot create the restaurant. Some parameter(s) missing. '
+                })
+            return error_msg, 404
     elif request.method == 'GET':
         return get_all_restaurant()
     
@@ -37,9 +46,8 @@ def restaurant_handler(id):
     elif request.method == 'DELETE':
         return delete_restaurant(id)
 
-def create_new_restaurant():
-    print request.args
-    return 'create new'
+def create_new_restaurant(mealType, location):
+    return 'create new with mealTpye: {}, location: {}'.format(mealType, location)
 
 def get_all_restaurant():
     return 'get all'
