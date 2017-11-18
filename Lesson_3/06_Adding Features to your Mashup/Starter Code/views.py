@@ -26,13 +26,9 @@ def all_restaurants_handler():
     if request.method == 'POST':
         mealType = request.args.get('mealType')
         location = request.args.get('location')
-        if (mealType is not None) and \
-           (location is not None):
-            return create_new_restaurant(mealType, location)
-        else:
-            error_msg = jsonify(error = \
-                'Cannot create the restaurant. Some parameter(s) missing. ')
-            return error_msg, 400
+
+        return create_new_restaurant(mealType, location)
+    
     elif request.method == 'GET':
         return get_all_restaurant()
     
@@ -56,13 +52,20 @@ def restaurant_handler(id):
         return delete_restaurant(id)
 
 def create_new_restaurant(mealType, location):
-    newResInfo = findARestaurant(mealType, location)
-    newRes = Restaurant(restaurant_address = newResInfo.get('address'), \
-                        restaurant_name = newResInfo.get('name'), \
-                        restaurant_image = newResInfo.get('image'))
-    session.add(newRes)
-    session.commit()
-    return jsonify(Restaurant = newRes.serialize)
+    if (mealType is not None) and \
+       (location is not None):
+        newResInfo = findARestaurant(mealType, location)
+        newRes = Restaurant(restaurant_address = newResInfo.get('address'), \
+                            restaurant_name = newResInfo.get('name'), \
+                            restaurant_image = newResInfo.get('image'))
+        session.add(newRes)
+        session.commit()
+        return jsonify(Restaurant = newRes.serialize)
+
+    else:
+        error_msg = jsonify(error = \
+            'Cannot create the restaurant. Some parameter(s) missing. ')
+        return error_msg, 400
 
 def get_all_restaurant():
     restaurants = session.query(Restaurant).all()
