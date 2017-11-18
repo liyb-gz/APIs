@@ -2,7 +2,7 @@ from findARestaurant import findARestaurant
 from models import Base, Restaurant
 from flask import Flask, jsonify, request
 from sqlalchemy.ext.declarative import declarative_base
-from sqlalchemy.orm import relationship, sessionmaker
+from sqlalchemy.orm import relationship, sessionmaker, exc
 from sqlalchemy import create_engine
 
 import sys
@@ -62,8 +62,9 @@ def get_restaurant(id):
     try:
         res = session.query(Restaurant).filter_by(id = id).one()
         return jsonify(Restaurant = res.serialize)
-    except:
-        return jsonify(error = 'Unable to get the restaurant.'), 404
+    except exc.NoResultFound:
+        return jsonify(error = 'No restaurant matches the given id.'), 404
+
 
 def update_restaurant(id):
     return 'update one'
