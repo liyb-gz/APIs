@@ -47,7 +47,13 @@ def restaurant_handler(id):
         return delete_restaurant(id)
 
 def create_new_restaurant(mealType, location):
-    return 'create new with mealTpye: {}, location: {}'.format(mealType, location)
+    newResInfo = findARestaurant(mealType, location)
+    newRes = Restaurant(restaurant_address = newResInfo.get('address'), \
+                        restaurant_name = newResInfo.get('name'), \
+                        restaurant_image = newResInfo.get('image'))
+    session.add(newRes)
+    session.commit()
+    return jsonify(Restaurant = newRes.serialize)
 
 def get_all_restaurant():
     return 'get all'
