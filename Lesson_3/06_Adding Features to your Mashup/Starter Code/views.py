@@ -21,7 +21,8 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 app = Flask(__name__)
 
-@app.route('/restaurants/', methods = ['GET', 'POST'])
+@app.route('/restaurants', methods = ['GET', 'POST'])
+# @app.route('/restaurants/', methods = ['GET', 'POST'])
 def all_restaurants_handler():
     if request.method == 'POST':
         mealType = request.args.get('mealType')
@@ -32,7 +33,8 @@ def all_restaurants_handler():
     elif request.method == 'GET':
         return get_all_restaurant()
     
-@app.route('/restaurants/<int:id>/', methods = ['GET','PUT', 'DELETE'])
+@app.route('/restaurants/<int:id>', methods = ['GET','PUT', 'DELETE'])
+# @app.route('/restaurants/<int:id>/', methods = ['GET','PUT', 'DELETE'])
 def restaurant_handler(id):
     if request.method == 'GET':
         return get_restaurant(id)
@@ -60,7 +62,7 @@ def create_new_restaurant(mealType, location):
                             restaurant_image = newResInfo.get('image'))
         session.add(newRes)
         session.commit()
-        return jsonify(Restaurant = newRes.serialize)
+        return jsonify(restaurant = newRes.serialize)
 
     else:
         error_msg = jsonify(error = \
@@ -69,12 +71,12 @@ def create_new_restaurant(mealType, location):
 
 def get_all_restaurant():
     restaurants = session.query(Restaurant).all()
-    return jsonify(Restaurants = [res.serialize for res in restaurants])
+    return jsonify(restaurants = [res.serialize for res in restaurants])
 
 def get_restaurant(id):
     try:
         res = session.query(Restaurant).filter_by(id = id).one()
-        return jsonify(Restaurant = res.serialize)
+        return jsonify(restaurant = res.serialize)
     except exc.NoResultFound:
         return jsonify(error = 'No restaurant matches the given id.'), 404
 
@@ -99,7 +101,7 @@ def update_restaurant(id, resInfo):
         session.add(res)
         session.commit()
 
-        return jsonify(Restaurant = res.serialize)
+        return jsonify(restaurant = res.serialize)
 
     except exc.NoResultFound:
         return jsonify(error = 'No restaurant matches the given id.'), 404
@@ -117,8 +119,8 @@ def delete_restaurant(id):
     try:
         res = session.query(Restaurant).filter_by(id = id).one()
         session.delete(res)
-        session.commit
-        return jsonify(Restaurant = res.serialize)
+        session.commit()
+        return jsonify(restaurant = res.serialize)
     except exc.NoResultFound:
         return jsonify(error = 'No restaurant matches the given id.'), 404
 
