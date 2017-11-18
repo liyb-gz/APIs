@@ -114,7 +114,13 @@ def update_restaurant(id, resInfo):
         return jsonify(error = message), 404
 
 def delete_restaurant(id):
-    return 'delete one'
+    try:
+        res = session.query(Restaurant).filter_by(id = id).one()
+        session.delete(res)
+        session.commit
+        return jsonify(Restaurant = res.serialize)
+    except exc.NoResultFound:
+        return jsonify(error = 'No restaurant matches the given id.'), 404
 
 
 if __name__ == '__main__':
