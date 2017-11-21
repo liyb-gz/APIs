@@ -13,6 +13,10 @@ DBSession = sessionmaker(bind=engine)
 session = DBSession()
 app = Flask(__name__)
 
+@app.errorhandler(400)
+def bad_request(error):
+    return jsonify(error = 'You sent a request that the server doesn\'t understand'), 400
+
 @app.route('/users', methods = ['POST'])
 def create_user():
     username = request.json.get('username')
