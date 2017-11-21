@@ -4,6 +4,10 @@ import json
 import sys
 import base64
 
+import codecs
+sys.stdout = codecs.getwriter('utf8')(sys.stdout)
+sys.stderr = codecs.getwriter('utf8')(sys.stderr)
+
 
 print "Running Endpoint Tester....\n"
 address = raw_input("Please enter the address of the server you want to access, \n If left blank the connection will be set to 'http://localhost:5000':   ")

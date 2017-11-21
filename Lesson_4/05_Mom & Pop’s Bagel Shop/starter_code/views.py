@@ -7,7 +7,6 @@ from flask.ext.httpauth import HTTPBasicAuth
 
 auth = HTTPBasicAuth() 
 
-
 engine = create_engine('sqlite:///bagelShop.db')
 
 Base.metadata.bind = engine
@@ -16,13 +15,33 @@ session = DBSession()
 app = Flask(__name__)
 
 #ADD @auth.verify_password here
+@auth.verify_password
+def verify_password(username, password):
+    return False
 
 #ADD a /users route here
+@app.route('/users', methods = ['POST'])
+def addUser():
+    username = request.json.get('username')
+    password = request.json.get('password')
 
+    if username is None or password is None:
+        abort(400, 'Missing user name or password.')
+
+    if session.query(User).filter_by(username = username).first() is not None:
+        abort(400, 'User already exists.')
+
+    newUser = User(username = username)
+    newUser.hash_password(password)
+
+    session.add(newUser)
+    session.commit()
+
+    return jsonify(username = newUser.username), 201
 
 
 @app.route('/bagels', methods = ['GET','POST'])
-#protect this route with a required login
+@auth.login_required
 def showAllBagels():
     if request.method == 'GET':
         bagels = session.query(Bagel).all()
